@@ -174,16 +174,10 @@ export default function Page() {
               Control Union Việt Nam kính mời tham dự
             </div>
 
-            <h1 className="text-3xl font-extrabold leading-[1.2] tracking-[-0.03em] text-[#173d35] sm:text-4xl lg:text-[2.75rem] xl:text-[3.25rem]">
-              <span className="block whitespace-nowrap">
-                Giới thiệu <span className="bg-gradient-to-r from-[#e47d35] to-[#d6681d] bg-clip-text text-transparent">Terax</span>
-              </span>
-              <span className="block whitespace-nowrap">
-                Số hóa truy xuất nguồn gốc
-              </span>
-              <span className="block whitespace-nowrap">
-                &amp; sẵn sàng cho EUDR
-              </span>
+            <h1 className="flex flex-wrap items-center gap-x-2 text-xl font-extrabold tracking-tight text-[#173d35] sm:text-2xl lg:text-3xl xl:text-4xl whitespace-nowrap">
+              <span>Giới thiệu <span className="bg-gradient-to-r from-[#e47d35] to-[#d6681d] bg-clip-text text-transparent">Terax</span></span>
+              <span>Số hóa truy xuất nguồn gốc</span>
+              <span>&amp; sẵn sàng cho EUDR</span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl leading-8 text-[#5c7168]">
