@@ -8,10 +8,12 @@ import {
   ChevronRight,
   Factory,
   Map,
+  Menu,
   Package,
   ScanSearch,
   Ship,
   Users,
+  X,
 } from 'lucide-react'
 
 const supplyChain = [
@@ -31,10 +33,49 @@ const benefits = [
 ]
 
 export default function Page() {
-  // 1. Hook tự động tải Tracking Script của BowNow vào Header
+  const [isNavOpen, setIsNavOpen] = useState(false)
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+
+    if (element) {
+      const navbar = document.getElementById('navbar')
+      const navbarHeight = navbar?.offsetHeight || 0
+
+      const top =
+        element.getBoundingClientRect().top +
+        window.pageYOffset -
+        navbarHeight -
+        20
+
+      window.scrollTo({
+        top,
+        behavior: 'smooth',
+      })
+    }
+
+    setIsNavOpen(false)
+  }
+
+  // 1. Hook xử lý hiệu ứng cuộn của Navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const navbar = document.getElementById('navbar')
+      if (window.scrollY > 10) {
+        navbar?.classList.add('backdrop-blur-md', 'bg-white/90', 'shadow-md')
+      } else {
+        navbar?.classList.remove('backdrop-blur-md', 'bg-white/90', 'shadow-md')
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // 2. Hook tải Tracking Script của BowNow vào Header
   useEffect(() => {
     const script = document.createElement('script')
-    script.src = "https://contents.bownow.jp/forms/sid_79340359725cff1f243d/trace.js"
+    script.src = "https://contents.bownow.jp/forms/sid_bbdd6e6bbf9c2f78993b/trace.js"
     script.charset = "utf-8"
     script.async = true
     document.head.appendChild(script)
@@ -46,29 +87,10 @@ export default function Page() {
     }
   }, [])
 
-  // 2. Hook render Form BowNow vào container liên hệ
-  useEffect(() => {
-    const container = document.getElementById('bownow-form-container')
-    if (!container) return
-
-    const script = document.createElement('script')
-    script.src = "https://contents.bownow.jp/forms/sid_79340359725cff1f243d/trace.js"
-    script.charset = "utf-8"
-    script.async = true
-
-    container.appendChild(script)
-
-    return () => {
-      if (container && container.contains(script)) {
-        container.removeChild(script)
-      }
-    }
-  }, [])
-
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f7f9f5] font-sans text-[#173d35] text-base leading-relaxed selection:bg-[#005a9c] selection:text-white">
+    <main className="relative z-10 w-full min-h-screen bg-[#f7f9f5] font-sans text-[#173d35] text-base leading-relaxed selection:bg-[#005a9c] selection:text-white">
       {/* Header / Navbar */}
-      <header className="sticky top-0 z-50 border-b border-[#dce7dd] bg-white/95 backdrop-blur-sm">
+      <header id="navbar" className="sticky top-0 z-50 border-b border-[#dce7dd] bg-white/95 backdrop-blur-sm transition-all duration-300">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
           <a
             href="https://vietnam.controlunion.com"
@@ -85,59 +107,96 @@ export default function Page() {
               />
             </span>
           </a>
-          <nav aria-label="Điều hướng chính" className="flex items-center gap-3 sm:gap-4">
-            <a
-              href="#register"
+
+          {/* PC Navigation */}
+          <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-3 sm:gap-4">
+            <button
+              onClick={() => scrollToSection('register')}
               className="inline-flex items-center gap-2 rounded-full bg-[#005a9c] px-6 py-3 text-base font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#004070] hover:shadow-lg"
             >
               Đăng ký ngay <ArrowRight className="size-5" aria-hidden="true" />
-            </a>
+            </button>
             <a
               href="https://vietnam.controlunion.com"
               target="_blank"
               rel="noreferrer"
-              className="hidden sm:inline-flex items-center gap-2 rounded-full border-2 border-[#bfd5c4] px-5 py-3 text-base font-bold text-[#173d35] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#005a9c] hover:bg-[#edf4ed] hover:text-[#005a9c]"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-[#bfd5c4] px-5 py-3 text-base font-bold text-[#173d35] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#005a9c] hover:bg-[#edf4ed] hover:text-[#005a9c]"
             >
               Về Control Union <ArrowRight className="size-5" aria-hidden="true" />
             </a>
           </nav>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setIsNavOpen(!isNavOpen)}
+            className="md:hidden p-2 text-[#173d35] hover:text-[#005a9c] transition-colors ml-auto z-50"
+            aria-label="Toggle Menu"
+          >
+            {isNavOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isNavOpen && (
+          <div className="md:hidden absolute left-0 right-0 top-full bg-white/95 backdrop-blur-md border-b border-[#dce7dd] px-6 py-6 space-y-4 shadow-xl z-50 animate-in fade-in slide-in-from-top-5 duration-200">
+            <button
+              onClick={() => scrollToSection('register')}
+              className="block w-full text-center py-3 bg-[#005a9c] text-white rounded-xl font-semibold shadow-md transition-all"
+            >
+              Đăng ký ngay
+            </button>
+
+            <a
+              href="https://vietnam.controlunion.com"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setIsNavOpen(false)}
+              className="block w-full text-center py-3 border-2 border-[#bfd5c4] text-[#173d35] rounded-xl font-semibold transition-all"
+            >
+              Về Control Union
+            </a>
+          </div>
+        )}
       </header>
 
       {/* Hero Banner Section */}
-      <section className="relative">
+      <section className="relative pt-10 pb-20 md:pt-16 md:pb-28">
         <div
           className="absolute -right-24 -top-24 size-96 rounded-full bg-[#dfeee0] blur-3xl pointer-events-none"
           aria-hidden="true"
         />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 pb-20 pt-14 lg:grid-cols-12 lg:items-center lg:px-10 lg:pb-28 lg:pt-20">
-          
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:items-center lg:px-10">
+
           {/* Cột trái: Văn bản thông tin */}
           <div className="lg:col-span-5">
             <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-[#bfd5c4] bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#497363]">
-              <span className="size-2 rounded-full bg-[#005a9c]" /> 
+              <span className="size-2 rounded-full bg-[#005a9c]" />
               Control Union Việt Nam kính mời tham dự
             </div>
-            
-            {/* TIÊU ĐỀ NGUYÊN BẢN GỐC NẰM GỌN TRONG ĐÚNG 3 HÀNG - FONT TO BẮT MẮT */}
-            <h1 className="text-4xl font-extrabold leading-[1.12] tracking-[-0.03em] text-[#173d35] sm:text-5xl lg:text-6xl">
-              Giới thiệu <span className="text-[#e47d35]">Terax</span><br />
-              Số hóa truy xuất nguồn gốc<br />
-              &amp; sẵn sàng cho EUDR
+
+            <h1 className="text-3xl font-extrabold leading-[1.2] tracking-[-0.03em] text-[#173d35] sm:text-4xl lg:text-[2.75rem] xl:text-[3.25rem]">
+              <span className="block whitespace-nowrap">
+                Giới thiệu <span className="bg-gradient-to-r from-[#e47d35] to-[#d6681d] bg-clip-text text-transparent">Terax</span>
+              </span>
+              <span className="block whitespace-nowrap">
+                Số hóa truy xuất nguồn gốc
+              </span>
+              <span className="block whitespace-nowrap">
+                &amp; sẵn sàng cho EUDR
+              </span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl leading-8 text-[#5c7168]">
               Bạn đang gặp khó khăn trong việc quản lý dữ liệu từ vùng trồng đến thành phẩm, truy xuất nguồn gốc và chuẩn bị hồ sơ EUDR?
             </p>
-            
-            {/* CTA Main Hero: Màu Xanh Control Union */}
+
             <div className="mt-8">
-              <a
-                href="#register"
+              <button
+                onClick={() => scrollToSection('register')}
                 className="inline-flex items-center gap-3 rounded-full bg-[#005a9c] px-8 py-4 text-lg font-bold text-white shadow-xl shadow-[#005a9c]/25 transition-all duration-300 hover:-translate-y-1 hover:bg-[#004070] hover:shadow-2xl"
               >
                 Đăng ký tham dự <ArrowRight className="size-6" aria-hidden="true" />
-              </a>
+              </button>
             </div>
 
             {/* Time Cards */}
@@ -155,7 +214,7 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Cột phải: Hình ảnh Banner phóng TO VÀ CÂN ĐỐI */}
+          {/* Cột phải: Hình ảnh Banner */}
           <div className="relative w-full lg:col-span-7">
             <div className="group overflow-hidden rounded-[2.5rem] bg-[#173d35] p-3 shadow-2xl shadow-[#173d35]/20 ring-1 ring-black/5 transition duration-500 hover:shadow-3xl">
               <img
@@ -172,8 +231,7 @@ export default function Page() {
       {/* Terax Supply Chain Section */}
       <section id="terax" className="bg-white py-24 lg:py-28">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          
-          {/* Block Căn Giữa Cỡ Chữ Lớn */}
+
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-base font-extrabold uppercase tracking-[0.18em] text-[#005a9c]">
               Một nền tảng, toàn bộ chuỗi cung ứng
@@ -186,7 +244,7 @@ export default function Page() {
             </p>
           </div>
 
-          {/* Supply Chain Interactive Hover Items */}
+          {/* Supply Chain Interactive Items */}
           <div className="mt-16 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {supplyChain.map(({ icon: Icon, label }, index) => (
               <div
@@ -240,7 +298,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Registration Section với Bownow Form Integration */}
+      {/* Registration Section với Bownow Form Iframe */}
       <section id="register" className="py-24 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-10">
           <div>
@@ -256,11 +314,18 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Form Container nhúng BowNow Form */}
           <div className="rounded-3xl bg-white p-6 shadow-xl shadow-[#173d35]/8 ring-1 ring-[#dce7dd] sm:p-10">
-            <div id="bownow-form-container" className="w-full overflow-hidden min-h-[500px]">
-              {/* Script BowNow sẽ tự động render Form vào đây */}
-            </div>
+            <iframe
+              src="https://contents.bownow.jp/forms/view?form_id=sid_434556a6dbedaeb8a2fd"
+              width="100%"
+              height="800"
+              frameBorder="0"
+              scrolling="yes"
+              style={{ display: 'block', border: 'none' }}
+              title="Terax Webinar Contact Form"
+            >
+              Loading form...
+            </iframe>
           </div>
         </div>
       </section>
